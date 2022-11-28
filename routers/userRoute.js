@@ -76,14 +76,14 @@ router.get("/user/profile", auth.userGuard, upload.single('picture'), (req,res)=
     })
 })
 
-//this is user update route
+//User update route
 router.put("/user/update", auth.userGuard,upload.single('picture'), (req, res) => {
     const id = req.userInfo._id;
     const firstname = req.body.firstname;
     const lastname = req.body.lastname;
     const username = req.body.username;
     const phone = req.body.phone;
-    // const address = req.body.address;
+    const address = req.body.address;
    
     const password = req.body.password;
     const email = req.body.email;
@@ -95,7 +95,7 @@ router.put("/user/update", auth.userGuard,upload.single('picture'), (req, res) =
             lastname: lastname,
             phone: phone,
             username:username,
-            // address:address,
+            address:address,
             phone: phone,
             password:password,
             email:email,
@@ -115,7 +115,7 @@ router.put("/user/update", auth.userGuard,upload.single('picture'), (req, res) =
             lastname: lastname,
             phone: phone,
             username:username,
-            // address:address,
+            address:address,
            
             password:password,
             email:email,
@@ -129,7 +129,6 @@ router.put("/user/update", auth.userGuard,upload.single('picture'), (req, res) =
         })
     }
 })
-
 
 
 
