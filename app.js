@@ -4,6 +4,8 @@ const app = express();
 var cors = require('cors');
 
 app.use(express.json());
+app.use(express.static(__dirname + '/photos'));
+
 app.use(cors())
 
 require('./db/database'); //connection

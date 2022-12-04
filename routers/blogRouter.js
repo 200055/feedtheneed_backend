@@ -40,7 +40,7 @@ router.get('/blog', async (req,res)=>{
     if (!blog_details) {
         res.status(500).json({success: false});
       } else {
-        res.status(201).json({success: true, data: blog_details });
+        res.status(201).json(blog_details ); 
       }
 })
 
