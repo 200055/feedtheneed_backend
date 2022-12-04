@@ -26,7 +26,6 @@ const staff = new mongoose.Schema({
     },
     phone:{
         type: Number,
-        require : true
     },
     password:{
         type: String,

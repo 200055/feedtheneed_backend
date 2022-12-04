@@ -12,12 +12,12 @@ const userRoute = require('./routers/userRoute');
 const adminRoute = require('./routers/adminRouter');
 const blogRoute = require('./routers/blogRouter');
 const staffRoute = require('./routers/staffRouter');
-const contactRoute= require('./routers/contactRouter');
+const helpAndSupportRouter= require('./routers/helpAndSupportRouter');
 app.use(userRoute);
 app.use(adminRoute);
 app.use(staffRoute);
 app.use(blogRoute);
-app.use(contactRoute);
+app.use(helpAndSupportRouter);
 
 
 
