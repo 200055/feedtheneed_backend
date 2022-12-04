@@ -50,6 +50,28 @@ router.post('/staff/register',auth.admin_guard,(req,res)=>{
     .catch() 
 })
 
+//view all staff
+router.get('/staff', async (req,res)=>{
+    const staff_details = await staff.find({})
+    if (!staff_details) {
+        res.status(500).json({success: false});
+      } else {
+        res.status(201).json(staff_details ); 
+      }
+})
+
+//router to delete partner
+router.delete('/staff/:id',auth.admin_guard, (req,res)=>{
+    const id = req.params.id;
+    staff.deleteOne({_id: id})
+    .then(()=>{
+        res.json({success:true, msg: "staff deleted successfully"})
+    })
+    .catch((e)=>{
+        res.json(e)
+    })
+
+})
 
 
 

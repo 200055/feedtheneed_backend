@@ -27,7 +27,7 @@ router.post('/admin/register',(req,res)=>{
         const password = req.body.password;
         const picture = req.body.picture;
 
-        bcryptjsjs.hash(password, 10, (e, hashed_pw)=>{
+        bcryptjs.hash(password, 10, (e, hashed_pw)=>{
             const data = new admin({
                 username : username,
                 email : email,
@@ -74,62 +74,127 @@ router.post('/admin/login',(req,res)=>{
 
 })
 
+// router.post("/admin/changepassword", auth.admin_guard, async (req, res) => {
+//     const { currentPassword, newPassword, confirmNewPassword } = req.body;
+//     const adminId = req.adminInfo._id;
+//     let errors = [];
+  
+//     //Check required fields
+//     if (!currentPassword || !newPassword || !confirmNewPassword) {
+//       errors.push({ msg: "Please fill in all fields." });
+//     }
+  
+//     //Check passwords match
+//     if (newPassword !== confirmNewPassword) {
+//       errors.push({ msg: "New passwords do not match." });
+//     }
+  
+//     //Check password length
+//     if (newPassword.length < 6 || confirmNewPassword.length < 6) {
+//       errors.push({ msg: "Password should be at least six characters." });
+//     }
+  
+//     if (errors.length > 0) {
+//       res.render("changepassword", {
+//         errors,
+//         name: req.adminInfo.username,
+//       });
+//     } else {
+//       //VALIDATION PASSED
+//       //Ensure current password submitted matches
+  
+//       admin.findOne({ adminId: adminId }).then(async (admin) => {
+//         //encrypt newly submitted password
+//         // async-await syntax
+//         const isMatch = await bcryptjs.compare(currentPassword, admin.password);
+  
+//         if (isMatch) {
+//           console.log(admin.password);
+//           //Update password for admin with new password
+//           bcryptjs.genSalt(10, (err, salt) =>
+//             bcryptjs.hash(newPassword, salt, (err, hash) => {
+//               if (err) throw err;
+//               admin.password = hash;
+//               admin.save();
+//             })
+//           );
+//           res.json({msg:"Password successfully updated!"})
+//         } else {
+//           //Password does not match
+//           errors.push({ msg: "Current password is not a match." });
+//           res.render("changepassword", {
+//             errors,
+//             username: req.admin.username,
+//           });
+//         }
+//       });
+//     }
+//   });
+
 router.post("/admin/changepassword", auth.admin_guard, async (req, res) => {
-    const { currentPassword, newPassword, confirmNewPassword } = req.body;
-    const adminId = req.adminInfo._id;
-    let errors = [];
-  
-    //Check required fields
-    if (!currentPassword || !newPassword || !confirmNewPassword) {
-      errors.push({ msg: "Please fill in all fields." });
-    }
-  
-    //Check passwords match
-    if (newPassword !== confirmNewPassword) {
-      errors.push({ msg: "New passwords do not match." });
-    }
-  
-    //Check password length
-    if (newPassword.length < 6 || confirmNewPassword.length < 6) {
-      errors.push({ msg: "Password should be at least six characters." });
-    }
-  
-    if (errors.length > 0) {
-      res.render("changepassword", {
-        errors,
-        username: req.user.username,
-      });
-    } else {
-      //VALIDATION PASSED
-      //Ensure current password submitted matches
-  
-      admin.findOne({ adminId: adminId }).then(async (admin) => {
-        //encrypt newly submitted password
-        // async-await syntax
-        const isMatch = await bcryptjs.compare(currentPassword, admin.password);
-  
-        if (isMatch) {
-          console.log(admin.password);
-          //Update password for admin with new password
-          bcryptjs.genSalt(10, (err, salt) =>
-            bcryptjs.hash(newPassword, salt, (err, hash) => {
-              if (err) throw err;
-              admin.password = hash;
-              admin.save();
-            })
-          );
-          res.json({msg:"Password successfully updated!"})
-        } else {
-          //Password does not match
-          errors.push({ msg: "Current password is not a match." });
-          res.render("changepassword", {
-            errors,
-            username: req.admin.username,
-          });
-        }
-      });
-    }
-  });
+  const { currentPassword, newPassword, confirmNewPassword } = req.body;
+  const adminId = req.adminInfo._id;
+  let errors = [];
+
+  //Check required fields
+  // if (!currentPassword || !newPassword || !confirmNewPassword) {
+  //   // errors.push({ msg: "Please fill in all fields." });
+  //   res.send( {msg:"Please fill in all fields"});
+  // }
+
+  //Check passwords match
+  if (newPassword !== confirmNewPassword) {
+    // errors.push({ msg: "New passwords do not match." });
+    res.send( {msg:"New passwords do not match"});
+    return;
+  }
+
+  //Check password length
+  if (newPassword.length < 6 || confirmNewPassword.length < 6) {
+    // errors.push({ msg: "Password should be at least six characters." });
+     res.send({msg:"Password should be at least six characters"});
+     return;
+  }
+  if(currentPassword == newPassword){
+    res.send( {msg:"New Password Cannot Be Same To Old"});
+    return;
+  }
+
+  if (errors.length > 0) {
+     res.send({msg:"Field cannot be empty"});
+     return;
+  } else {
+    //VALIDATION PASSED
+    //Ensure current password submitted matches
+
+    admin.findOne({ adminId: adminId }).then(async (admin) => {
+      //encrypt newly submitted password
+      // async-await syntax
+      const isMatch = await bcryptjs.compare(currentPassword, admin.password);
+
+      
+      if (isMatch) {
+        console.log(admin.password);
+        //Update password for admin with new password
+        bcryptjs.genSalt(10, (err, salt) =>
+          bcryptjs.hash(newPassword, salt, (err, hash) => {
+            if (err) throw err;
+            admin.password = hash;
+            admin.save();
+          })
+        );
+        res.send( {msg:"Password successfully updated!"});
+        return;
+      } 
+      else {
+        //Password does not match
+        res.send({msg: "Current password is not a match"})
+        return;
+        // errors.push({ msg: "Current password is not a match." });
+      }
+    });
+  }
+});
 
 
 // dashboard for admin
