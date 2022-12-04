@@ -34,7 +34,7 @@ router.get('/partner', async (req,res)=>{
     if (!partner_details) {
         res.status(500).json({success: false});
       } else {
-        res.status(201).json({success: true, data: partner_details });
+        res.status(201).json( partner_details );
       }
 })
 
