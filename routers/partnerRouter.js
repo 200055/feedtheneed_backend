@@ -49,7 +49,6 @@ router.get('/partner/:id', async (req,res)=>{
 
 // router for updating partner
 router.put('/partner/update/:id', auth.admin_guard, upload.single('partner_image'), (req,res)=>{
-    console.log(req.body);
     const  _id = req.params.id;
     const partner_name = req.body.partner_name;
     const partner_category = req.body.partner_category;
