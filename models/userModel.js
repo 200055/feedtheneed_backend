@@ -24,7 +24,7 @@ const User = new mongoose.Schema({
         type : String,
     },
     dob:{
-        type : Date,
+        type : String,
     },
     phone:{
         type : String,

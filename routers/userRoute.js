@@ -72,7 +72,9 @@ router.get("/user/profile", auth.userGuard, upload.single('picture'), (req,res)=
         lastname : req.userInfo.lastname,
         username: req.userInfo.username,
         email: req.userInfo.email,
-        phone: req.userInfo.phone
+        phone: req.userInfo.phone,
+        address: req.userInfo.address,
+        dob: req.userInfo.dob,
     })
 })
 
@@ -87,6 +89,8 @@ router.put("/user/update", auth.userGuard,upload.single('picture'), (req, res) =
    
     const password = req.body.password;
     const email = req.body.email;
+    const dob = req.body.dob;
+    console.log(req.file)
     if (req.file == undefined) {
         User.updateOne({
             _id: id
@@ -99,6 +103,7 @@ router.put("/user/update", auth.userGuard,upload.single('picture'), (req, res) =
             phone: phone,
             password:password,
             email:email,
+            dob:dob,
 
         })
         .then(() => {
@@ -119,6 +124,7 @@ router.put("/user/update", auth.userGuard,upload.single('picture'), (req, res) =
            
             password:password,
             email:email,
+            dob : dob,
             picture:req.file.filename
         })
         .then(() => {

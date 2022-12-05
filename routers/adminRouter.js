@@ -60,7 +60,8 @@ router.post('/admin/login',(req,res)=>{
         }
         bcryptjs.compare(password, a_data.password, (e,result)=>{
             if (result == false){
-                return res.json({msg:"Invalid Credentials"})
+              return res.status(201).json({msg:"Invalid Credentials"})
+                // return res.json({msg:"Invalid Credentials"})
             }
             
             // creates token for logged in user
@@ -73,63 +74,6 @@ router.post('/admin/login',(req,res)=>{
     .catch()
 
 })
-
-// router.post("/admin/changepassword", auth.admin_guard, async (req, res) => {
-//     const { currentPassword, newPassword, confirmNewPassword } = req.body;
-//     const adminId = req.adminInfo._id;
-//     let errors = [];
-  
-//     //Check required fields
-//     if (!currentPassword || !newPassword || !confirmNewPassword) {
-//       errors.push({ msg: "Please fill in all fields." });
-//     }
-  
-//     //Check passwords match
-//     if (newPassword !== confirmNewPassword) {
-//       errors.push({ msg: "New passwords do not match." });
-//     }
-  
-//     //Check password length
-//     if (newPassword.length < 6 || confirmNewPassword.length < 6) {
-//       errors.push({ msg: "Password should be at least six characters." });
-//     }
-  
-//     if (errors.length > 0) {
-//       res.render("changepassword", {
-//         errors,
-//         name: req.adminInfo.username,
-//       });
-//     } else {
-//       //VALIDATION PASSED
-//       //Ensure current password submitted matches
-  
-//       admin.findOne({ adminId: adminId }).then(async (admin) => {
-//         //encrypt newly submitted password
-//         // async-await syntax
-//         const isMatch = await bcryptjs.compare(currentPassword, admin.password);
-  
-//         if (isMatch) {
-//           console.log(admin.password);
-//           //Update password for admin with new password
-//           bcryptjs.genSalt(10, (err, salt) =>
-//             bcryptjs.hash(newPassword, salt, (err, hash) => {
-//               if (err) throw err;
-//               admin.password = hash;
-//               admin.save();
-//             })
-//           );
-//           res.json({msg:"Password successfully updated!"})
-//         } else {
-//           //Password does not match
-//           errors.push({ msg: "Current password is not a match." });
-//           res.render("changepassword", {
-//             errors,
-//             username: req.admin.username,
-//           });
-//         }
-//       });
-//     }
-//   });
 
 router.post("/admin/changepassword", auth.admin_guard, async (req, res) => {
   const { currentPassword, newPassword, confirmNewPassword } = req.body;

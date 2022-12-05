@@ -2,8 +2,9 @@ const request = require('supertest');
 const app = require('../app.js');
 
 const usertoken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MzcxMjc5YTg3NDkzMzk3YzNhYWRhMGYiLCJpYXQiOjE2Njg5MjYxNjF9.8XqxEBc8pmVHSfYN4Y1TRX9laWUSlTLcKYPZ92c9CAc"
+const admintoken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbklkIjoiNjM4MzA0MTQyYjgyOTI4ZTIxOTFlMTlkIiwiaWF0IjoxNjcwMjMyMDY0fQ.LtSkhOvwHKEwcYwzu32oB_9omv36Wtkhkik-ZdXqLXY"
 
-
+// User
   test("User register test", async () => {
     await request(app)
       .post("/user/insert")
@@ -56,6 +57,38 @@ const usertoken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MzcxMjc5
     })
     .expect(200)
   })
+
+  // Update Information
+  test("Update Information", async () =>{
+    await request(app)
+    .put("/user/update")
+    .set("Authorization", usertoken)
+    .send({
+      firstname: "PrabTest",
+      lastname: "AryalTest",
+    })
+    .expect(200)
+  })
+
+  //Admin
+  // Admin Login
+  test("Admin Login", async () =>{
+    await request(app)
+    .put("/admin/login")
+    .send({
+      email: "duku.aryal@gmail.com",
+      lastname: "1234578",
+    })
+    .expect(200)
+  })
+
+  //Admin Dashboard
+  test("Admin Login", async () =>{
+    await request(app)
+    .put("/admin/dashboard")
+    .expect(200)
+  })
+
 
 
 
