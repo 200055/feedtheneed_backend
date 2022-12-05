@@ -77,13 +77,13 @@ const admintoken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbklkIjoiNjM4MzA
     .post("/admin/login")
     .send({
       email: "duku.aryal@gmail.com",
-      lastname: "123456",
+      password: "12345a6",
     })
     .expect(200)
   })
 
   //Admin Dashboard
-  test("Admin Login", async () =>{
+  test("Admin Dashboard", async () =>{
     await request(app)
     .get("/admin/dashboard", admintoken)
     .expect(201)
