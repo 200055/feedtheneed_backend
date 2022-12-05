@@ -2,7 +2,7 @@ const request = require('supertest');
 const app = require('../app.js');
 
 const usertoken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MzcxMjc5YTg3NDkzMzk3YzNhYWRhMGYiLCJpYXQiOjE2Njg5MjYxNjF9.8XqxEBc8pmVHSfYN4Y1TRX9laWUSlTLcKYPZ92c9CAc"
-const admintoken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbklkIjoiNjM4MzA0MTQyYjgyOTI4ZTIxOTFlMTlkIiwiaWF0IjoxNjcwMjMyMDY0fQ.LtSkhOvwHKEwcYwzu32oB_9omv36Wtkhkik-ZdXqLXY"
+const admintoken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbklkIjoiNjM4MzA0MTQyYjgyOTI4ZTIxOTFlMTlkIiwiaWF0IjoxNjcwMjY1ODA2fQ.4CRRKNwKodUTRY1NPatr9zCpjh-j3k_hPS-y2Ff1Pt0"
 
 // User
   test("User register test", async () => {
@@ -74,10 +74,10 @@ const admintoken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbklkIjoiNjM4MzA
   // Admin Login
   test("Admin Login", async () =>{
     await request(app)
-    .put("/admin/login")
+    .post("/admin/login")
     .send({
       email: "duku.aryal@gmail.com",
-      lastname: "1234578",
+      lastname: "123456",
     })
     .expect(200)
   })
@@ -85,8 +85,8 @@ const admintoken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbklkIjoiNjM4MzA
   //Admin Dashboard
   test("Admin Login", async () =>{
     await request(app)
-    .put("/admin/dashboard")
-    .expect(200)
+    .get("/admin/dashboard", admintoken)
+    .expect(201)
   })
 
 

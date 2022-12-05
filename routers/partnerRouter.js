@@ -52,8 +52,6 @@ router.put('/partner/update/:id', auth.admin_guard, upload.single('partner_image
     const  _id = req.params.id;
     const partner_name = req.body.partner_name;
     const partner_category = req.body.partner_category;
-    // const partner_image = req.file.filename;
-    // const partner_image = req.file.filename;   
 
     if(req.file==undefined){
         partner.updateOne({
