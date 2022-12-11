@@ -1,7 +1,7 @@
 const express = require('express');
 const bcryptjs = require('bcryptjs');
 const router = new express.Router();
-const User = require('../models/userModel');
+const user = require('../models/userModel');
 const jwt = require('jsonwebtoken');
 const auth = require('../auth/auth');
 const upload = require('../fileupload/fileupload');
@@ -11,7 +11,7 @@ const upload = require('../fileupload/fileupload');
 router.post("/user/insert", (req,res)=>{
     const email = req.body.email;
     // make email unique
-    User.findOne({email : email})
+    user.findOne({email : email})
     .then((user_data)=>
     {
         if(user_data!=null){
@@ -23,7 +23,7 @@ router.post("/user/insert", (req,res)=>{
 
         //encrypt password in database
         bcryptjs.hash(password,10,(e, hashed_pw)=>{
-            const data = new User({
+            const data = new user({
                 phone : phone,
                 email : email,            
                 password : hashed_pw,
@@ -44,7 +44,7 @@ router.post("/user/insert", (req,res)=>{
 router.post("/user/login", (req,res)=>{
     const email = req.body.email;
     const password = req.body.password;
-    User.findOne({email: email})
+    user.findOne({email: email})
     .then((user_data)=>{
         if(user_data == null){
             res.json({msg : "Invalid Credentials"}) 
@@ -57,7 +57,7 @@ router.post("/user/login", (req,res)=>{
             }
             //creates token for logged in users
             // this token stores logged in user id
-            const token = jwt.sign({userId: user_data._id}, "##0a9ajdjd92saSda@342!2#$90"); // secret key as extra auth (database_signature)
+            const token = jwt.sign({userId: user_data._id}, "##0a9ajdjd92saSda@342!2#$90user"); // secret key as extra auth (database_signature)
             res.json({msg:"Success",token: token});
         })
     })
@@ -92,7 +92,7 @@ router.put("/user/update", auth.userGuard,upload.single('picture'), (req, res) =
     const dob = req.body.dob;
     console.log(req.file)
     if (req.file == undefined) {
-        User.updateOne({
+        user.updateOne({
             _id: id
         }, {
             firstname: firstname,
@@ -113,7 +113,7 @@ router.put("/user/update", auth.userGuard,upload.single('picture'), (req, res) =
             res.json({ message: "invalid" })
         })
     }else{
-    User.updateOne({
+    user.updateOne({
             _id: id
         }, {
             firstname: firstname,
@@ -135,6 +135,72 @@ router.put("/user/update", auth.userGuard,upload.single('picture'), (req, res) =
         })
     }
 })
+
+router.post("/user/changepassword", auth.userGuard, async (req, res) => {
+    const { currentPassword, newPassword, confirmNewPassword } = req.body;
+    const userId = req.userInfo._id;
+    console.log(userId);
+    let errors = [];
+  
+    //Check required fields
+    // if (!currentPassword || !newPassword || !confirmNewPassword) {
+    //   // errors.push({ msg: "Please fill in all fields." });
+    //   res.send( {msg:"Please fill in all fields"});
+    // }
+  
+    //Check passwords match
+    if (newPassword !== confirmNewPassword) {
+      // errors.push({ msg: "New passwords do not match." });
+      res.send( {msg:"New passwords do not match"});
+      return;
+    }
+  
+    //Check password length
+    if (newPassword.length < 6 || confirmNewPassword.length < 6) {
+      // errors.push({ msg: "Password should be at least six characters." });
+       res.send({msg:"Password should be at least six characters"});
+       return;
+    }
+    if(currentPassword == newPassword){
+      res.send( {msg:"New Password Cannot Be Same To Old"});
+      return;
+    }
+  
+    if (errors.length > 0) {
+       res.send({msg:"Field cannot be empty"});
+       return;
+    } else {
+      //VALIDATION PASSED
+      //Ensure current password submitted matches
+  
+      user.findOne({ _id: userId }).then(async (user) => {
+        //encrypt newly submitted password
+        // async-await syntax
+        const isMatch = await bcryptjs.compare(currentPassword, user.password);
+        console.log(await bcryptjs.compare(currentPassword, user.password))
+        console.log(user.password)
+        if (isMatch) {
+          console.log(user.password);
+          //Update password for user with new password
+          bcryptjs.genSalt(10, (err, salt) =>
+            bcryptjs.hash(newPassword, salt, (err, hash) => {
+              if (err) throw err;
+              user.password = hash;
+              user.save();
+            })
+          );
+          res.send( {msg:"Password successfully updated!"});
+          return;
+        } 
+        else {
+          //Password does not match
+          res.send({msg: "Current password is not a match"})
+          return;
+          // errors.push({ msg: "Current password is not a match." });
+        }
+      });
+    }
+  });
 
 
 

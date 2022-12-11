@@ -66,7 +66,7 @@ router.post('/admin/login',(req,res)=>{
             
             // creates token for logged in user
             // The token stores the logged in user id
-            const token = jwt.sign({adminId : a_data._id}, "##0a9ajdjd92saSda@342!2#$90");
+            const token = jwt.sign({adminId : a_data._id}, "##0a9ajdjd92saSda@342!2#$90admin");
             res.json({token : token});
 
         })
@@ -111,7 +111,7 @@ router.post("/admin/changepassword", auth.admin_guard, async (req, res) => {
     //VALIDATION PASSED
     //Ensure current password submitted matches
 
-    admin.findOne({ adminId: adminId }).then(async (admin) => {
+    admin.findOne({ _id: adminId }).then(async (admin) => {
       //encrypt newly submitted password
       // async-await syntax
       const isMatch = await bcryptjs.compare(currentPassword, admin.password);

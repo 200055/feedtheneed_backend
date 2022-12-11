@@ -10,7 +10,7 @@ module.exports.userGuard = (req,res,next)=> {
         const token = req.headers.authorization.split(" ")[1];
         const data = jwt.verify(token, "##0a9ajdjd92saSda@342!2#$90user");
         // iat is expiry date
-        console.log(data);
+        // console.log(data);
         user.findOne({_id: data.userId})
         .then((udata)=>{
             // console.log(udata)
