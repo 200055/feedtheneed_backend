@@ -77,7 +77,7 @@ const admintoken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbklkIjoiNjM4MzA
     .post("/admin/login")
     .send({
       email: "duku.aryal@gmail.com",
-      password: "12345a6",
+      password: "123456",
     })
     .expect(200)
   })
@@ -85,8 +85,9 @@ const admintoken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbklkIjoiNjM4MzA
   //Admin Dashboard
   test("Admin Dashboard", async () =>{
     await request(app)
-    .get("/admin/dashboard", admintoken)
-    .expect(201)
+    .get("/admin/dashboard")
+    .set("Authorization", admintoken)
+    .expect(200)
   })
 
 

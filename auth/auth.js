@@ -8,7 +8,7 @@ const admin = require('../models/adminModel')
 module.exports.userGuard = (req,res,next)=> {
     try{
         const token = req.headers.authorization.split(" ")[1];
-        const data = jwt.verify(token, "##0a9ajdjd92saSda@342!2#$90");
+        const data = jwt.verify(token, "##0a9ajdjd92saSda@342!2#$90user");
         // iat is expiry date
         console.log(data);
         user.findOne({_id: data.userId})
@@ -30,7 +30,7 @@ module.exports.userGuard = (req,res,next)=> {
 module.exports.staff_guard = (req,res,next)=>{
     try{
         const token = req.headers.authorization.split(" ")[1];
-        const data = jwt.verify(token, "##0a9ajdjd92saSda@342!2#$90");
+        const data = jwt.verify(token, "##0a9ajdjd92saSda@342!2#$90staff");
         // res.json({msg:data});
 
         staff.findOne({_id : data.staffId})
@@ -54,7 +54,7 @@ module.exports.staff_guard = (req,res,next)=>{
 module.exports.admin_guard = (req,res,next)=>{
     try{
         const token = req.headers.authorization.split(" ")[1];
-        const data = jwt.verify(token, "##0a9ajdjd92saSda@342!2#$90");
+        const data = jwt.verify(token, "##0a9ajdjd92saSda@342!2#$90admin");
         // res.json({msg:data});
 
         admin.findOne({_id : data.adminId})
