@@ -62,7 +62,6 @@ router.get('/blog/:id', async (req,res)=>{
 
 // router for updating blog
 router.put('/blog/update/:id', auth.admin_guard,upload.fields([{name:'blog_image',maxCount: 1},{name:'donor_image',maxCount: 1}]) , (req,res)=>{
-    console.log(req.body);
     const  _id = req.params.id;
     const blog_name = req.body.blog_name;
     const short_desc = req.body.short_desc;
@@ -101,7 +100,7 @@ router.put('/blog/update/:id', auth.admin_guard,upload.fields([{name:'blog_image
             blog_category : blog_category,
             donor_name:donor_name,
             blog_price,blog_price,
-            banner_image: req.files['donor_image'][0].filename
+            donor_image: req.files['donor_image'][0].filename
         })
         .then(()=>{
             res.json({success:true, msg:"Updated"})}  
@@ -119,7 +118,7 @@ router.put('/blog/update/:id', auth.admin_guard,upload.fields([{name:'blog_image
             blog_category : blog_category,
             donor_name:donor_name,
             blog_price,blog_price,
-            banner_image: req.files['blog_image'][0].filename
+            blog_image: req.files['blog_image'][0].filename
         })
         .then(()=>{
             res.json({success:true, msg:"Updated"})}  
@@ -138,8 +137,8 @@ router.put('/blog/update/:id', auth.admin_guard,upload.fields([{name:'blog_image
             blog_category : blog_category,
             donor_name:donor_name,
             blog_price,blog_price,
-            banner_image: req.files['blog_image'][0].filename,
-            banner_image: req.files['donor_image'][0].filename
+            blog_image: req.files['blog_image'][0].filename,
+            donor_image: req.files['donor_image'][0].filename
         })
         .then(()=>{
             res.json({success:true, msg:"Updated"})}  
