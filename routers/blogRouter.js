@@ -14,7 +14,7 @@ router.post('/blog/insert',auth.admin_guard,upload.single('blog_image'),(req,res
     const short_desc = req.body.short_desc;
     const blog_desc = req.body.blog_desc;
     const blog_category = req.body.blog_category;
-    const blog_category_name = req.body.blog_category_name;
+    // const blog_category_name = req.body.blog_category_name;
     const blog_image = req.file.filename;
 
     const data = new blog({
@@ -22,7 +22,7 @@ router.post('/blog/insert',auth.admin_guard,upload.single('blog_image'),(req,res
         short_desc : short_desc,
         blog_desc : blog_desc,
         blog_category : blog_category,
-        blog_category_name : blog_category_name,
+        // blog_category_name : blog_category_name,
         blog_image : blog_image
     })
 
@@ -61,7 +61,7 @@ router.put('/blog/update/:id', auth.admin_guard, upload.single('blog_image'), (r
     const short_desc = req.body.short_desc;
     const blog_desc = req.body.blog_desc;
     const blog_category = req.body.blog_category;
-    const blog_category_name = req.body.blog_category_name;
+    // const blog_category_name = req.body.blog_category_name;
     // const blog_image = req.file.filename;
 
     if(req.file==undefined){
@@ -72,7 +72,7 @@ router.put('/blog/update/:id', auth.admin_guard, upload.single('blog_image'), (r
             short_desc : short_desc,
             blog_desc : blog_desc,
             blog_category : blog_category,
-            blog_category_name : blog_category_name,
+            // blog_category_name : blog_category_name,
         })
         .then(()=>{
             res.json({success:true, msg:"Updated"})}  
@@ -88,7 +88,7 @@ router.put('/blog/update/:id', auth.admin_guard, upload.single('blog_image'), (r
             short_desc : short_desc,
             blog_desc : blog_desc,
             blog_category : blog_category,
-            blog_category_name : blog_category_name,
+            // blog_category_name : blog_category_name,
             blog_image : req.file.filename
         })
         .then(()=>{

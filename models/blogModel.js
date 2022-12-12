@@ -14,9 +14,9 @@ const blog = new mongoose.Schema({
     blog_category:{
         type: String
     },
-    blog_category_name:{
-        type: String,
-    },
+    // blog_category_name:{
+    //     type: String,
+    // },
     blog_price:{
         type: Number,
         require: true

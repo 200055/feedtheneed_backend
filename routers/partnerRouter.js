@@ -9,6 +9,7 @@ const upload = require('../fileUpload/fileUpload');
 
 // route for inserting partner
 router.post('/partner/insert',auth.admin_guard,upload.fields([{name:'partner_image',maxCount: 1},{name:'banner_image',maxCount: 1}]),(req,res)=>{
+    console.log(req.files)
     if(req.files == undefined){
         return res.json({msg:"Invalid file format"})
     }
@@ -53,12 +54,12 @@ router.get('/partner/:id', async (req,res)=>{
 })
 
 // router for updating partner
-router.put('/partner/update/:id', auth.admin_guard, upload.single('partner_image'), (req,res)=>{
+router.put('/partner/update/:id', auth.admin_guard, upload.fields([{name:'partner_image',maxCount: 1},{name:'banner_image',maxCount: 1}]), (req,res)=>{
     const  _id = req.params.id;
     const partner_name = req.body.partner_name;
     const partner_category = req.body.partner_category;
 
-    if(req.file==undefined){
+    if(req.files['banner_image'] == undefined && req.files['partner_image'] == undefined){
         partner.updateOne({
             _id: _id
         },{
@@ -71,13 +72,45 @@ router.put('/partner/update/:id', auth.admin_guard, upload.single('partner_image
         .catch((e)=>{
             res.json({msg:"Failed to update partner"})
         })
-    } else{
+    } else if (req.files['partner_image'] == undefined){
         partner.updateOne({
             _id: _id
         },{
             partner_name : partner_name,
             partner_category : partner_category,
-            partner_image : req.file.filename
+            banner_image: req.files['banner_image'][0].filename
+
+        })
+        .then(()=>{
+            res.json({success:true, msg:"Updated"})}  
+        )
+        .catch((e)=>{
+            res.json({msg:"Failed to update partner"})
+        })
+    } else if (req.files['banner_image'] == undefined){
+        partner.updateOne({
+            _id: _id
+        },{
+            partner_name : partner_name,
+            partner_category : partner_category,
+            partner_image: req.files['partner_image'][0].filename
+        })
+        .then(()=>{
+            res.json({success:true, msg:"Updated"})}  
+        )
+        .catch((e)=>{
+            res.json({msg:"Failed to update partner"})
+        })
+    }
+    else{
+        partner.updateOne({
+            _id: _id
+        },{
+            partner_name : partner_name,
+            partner_category : partner_category,
+            partner_image : req.files['partner_image'][0].filename,
+            banner_image: req.files['banner_image'][0].filename
+
         })
         .then(()=>{
             res.json({success:true, msg:"Updated"})}  
