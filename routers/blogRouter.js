@@ -4,9 +4,10 @@ const blog = require('../models/blogModel');
 const auth = require('../auth/auth');
 const upload = require('../fileUpload/fileUpload');
 
+// upload.fields([{name:'blog_image',maxCount: 1},{name:'banner_image',maxCount: 1}])
 // route for inserting blog
-router.post('/blog/insert',auth.admin_guard,upload.single('blog_image'),(req,res)=>{
-    if(req.file == undefined){
+router.post('/blog/insert',auth.admin_guard,upload.fields([{name:'blog_image',maxCount: 1},{name:'donor_image',maxCount: 1}]),(req,res)=>{
+    if(req.files == undefined){
         return res.json({msg:"Invalid file format"})
     }
 
@@ -14,16 +15,22 @@ router.post('/blog/insert',auth.admin_guard,upload.single('blog_image'),(req,res
     const short_desc = req.body.short_desc;
     const blog_desc = req.body.blog_desc;
     const blog_category = req.body.blog_category;
+    const donor_name = req.body.donor_name;
+    const blog_price = req.body.blog_price
     // const blog_category_name = req.body.blog_category_name;
-    const blog_image = req.file.filename;
+    const blog_image = req.files['blog_image'][0].filename;
+    const donor_image = req.files['donor_image'][0].filename;
 
     const data = new blog({
         blog_name : blog_name,
         short_desc : short_desc,
         blog_desc : blog_desc,
         blog_category : blog_category,
+        blog_price: blog_price,
+        donor_name: donor_name,
         // blog_category_name : blog_category_name,
-        blog_image : blog_image
+        blog_image : blog_image,
+        donor_image: donor_image
     })
 
     data.save()
@@ -54,17 +61,19 @@ router.get('/blog/:id', async (req,res)=>{
 })
 
 // router for updating blog
-router.put('/blog/update/:id', auth.admin_guard, upload.single('blog_image'), (req,res)=>{
+router.put('/blog/update/:id', auth.admin_guard,upload.fields([{name:'blog_image',maxCount: 1},{name:'donor_image',maxCount: 1}]) , (req,res)=>{
     console.log(req.body);
     const  _id = req.params.id;
     const blog_name = req.body.blog_name;
     const short_desc = req.body.short_desc;
     const blog_desc = req.body.blog_desc;
     const blog_category = req.body.blog_category;
+    const donor_name = req.body.donor_name;
+    const blog_price = req.body.blog_price
     // const blog_category_name = req.body.blog_category_name;
     // const blog_image = req.file.filename;
 
-    if(req.file==undefined){
+    if(req.files['blog_image'] == undefined && req.files['donor_image'] == undefined){
         blog.updateOne({
             _id: _id
         },{
@@ -72,6 +81,8 @@ router.put('/blog/update/:id', auth.admin_guard, upload.single('blog_image'), (r
             short_desc : short_desc,
             blog_desc : blog_desc,
             blog_category : blog_category,
+            donor_name:donor_name,
+            blog_price,blog_price
             // blog_category_name : blog_category_name,
         })
         .then(()=>{
@@ -80,7 +91,7 @@ router.put('/blog/update/:id', auth.admin_guard, upload.single('blog_image'), (r
         .catch((e)=>{
             res.json({msg:"Failed to update blog"})
         })
-    } else{
+    } else if(req.files['blog_image'] == undefined){
         blog.updateOne({
             _id: _id
         },{
@@ -88,8 +99,47 @@ router.put('/blog/update/:id', auth.admin_guard, upload.single('blog_image'), (r
             short_desc : short_desc,
             blog_desc : blog_desc,
             blog_category : blog_category,
-            // blog_category_name : blog_category_name,
-            blog_image : req.file.filename
+            donor_name:donor_name,
+            blog_price,blog_price,
+            banner_image: req.files['donor_image'][0].filename
+        })
+        .then(()=>{
+            res.json({success:true, msg:"Updated"})}  
+        )
+        .catch((e)=>{
+            res.json({msg:"Failed to update blog"})
+        })
+    } else if(req.files['donor_image'] == undefined){
+        blog.updateOne({
+            _id: _id
+        },{
+            blog_name : blog_name,
+            short_desc : short_desc,
+            blog_desc : blog_desc,
+            blog_category : blog_category,
+            donor_name:donor_name,
+            blog_price,blog_price,
+            banner_image: req.files['blog_image'][0].filename
+        })
+        .then(()=>{
+            res.json({success:true, msg:"Updated"})}  
+        )
+        .catch((e)=>{
+            res.json({msg:"Failed to update blog"})
+        })
+    }
+    else{
+        blog.updateOne({
+            _id: _id
+        },{
+            blog_name : blog_name,
+            short_desc : short_desc,
+            blog_desc : blog_desc,
+            blog_category : blog_category,
+            donor_name:donor_name,
+            blog_price,blog_price,
+            banner_image: req.files['blog_image'][0].filename,
+            banner_image: req.files['donor_image'][0].filename
         })
         .then(()=>{
             res.json({success:true, msg:"Updated"})}  

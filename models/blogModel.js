@@ -14,14 +14,16 @@ const blog = new mongoose.Schema({
     blog_category:{
         type: String
     },
-    // blog_category_name:{
-    //     type: String,
-    // },
     blog_price:{
         type: Number,
-        require: true
     },
     blog_image:{
+        type:String
+    },
+    donor_name:{
+        type: String,
+    },
+    donor_image:{
         type:String
     }
 })
