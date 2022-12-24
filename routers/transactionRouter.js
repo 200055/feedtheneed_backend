@@ -8,7 +8,7 @@ const auth = require('../auth/auth');
 const upload = require('../fileupload/fileupload');
 
 //transaction send
-router.post("/user/send_transcation",auth.userGuard, (req,res)=>{
+router.post("/user/send_transaction",auth.userGuard, (req,res)=>{
     const user_id = req.userInfo._id;
     const donation_amount = req.body.donation_amount;
     const donation_category = req.body.donation_category;
@@ -26,10 +26,10 @@ router.post("/user/send_transcation",auth.userGuard, (req,res)=>{
     })
     data.save()
     .then(()=>{
-        res.json({success:true, msg:"Transcation Successful"})}  
+        res.json({success:true, msg:"Transaction Successful"})}  
     )
     .catch((e)=>{
-        res.json({msg:"Transcation Failed"})
+        res.json({msg:"Transaction Failed"})
     })
 })
 
@@ -65,7 +65,7 @@ router.get("/leaderboard",async(req,res)=>{
       });
 })
 
-router.get("/all_transcations",async(req,res)=>{ 
+router.get("/all_transaction",async(req,res)=>{ 
     await transaction.find({})
     .populate({
         path: "user_id"
