@@ -1,21 +1,22 @@
 const mongoose = require('mongoose');
+const { array } = require('../fileUpload/fileUpload');
 
 const User = new mongoose.Schema({
-    firstname:{
-        type: String,
-
-    },
-    lastname:{
-        type: String,
-
-    },
-    username:{
-        type : String,
-
-    },
     email:{
         type : String,
         required : true
+    },
+    phone:{
+        type : String,
+        required : true
+    },
+    password:{
+        type: String,
+        required : true,
+    },
+    donation_point:{
+        type: Number,
+        "default": 0
     },
     age:{
         type : Number,
@@ -26,20 +27,23 @@ const User = new mongoose.Schema({
     dob:{
         type : String,
     },
-    phone:{
-        type : String,
-        required : true
-    },
-    password:{
-        type: String,
-        required : true,
-    },
     picture:{
         type: String
     },
     address:{
         type: String
     },
+    firstname:{
+        type: String,
+    
+    },
+    lastname:{
+        type: String,
+    
+    },
+    username:{
+        type : String,
+    }
 })
 
 module.exports = mongoose.model('User', User)

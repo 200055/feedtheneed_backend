@@ -145,6 +145,7 @@ router.get("/user/profile", auth.userGuard, upload.single('picture'), (req,res)=
         phone: req.userInfo.phone,
         address: req.userInfo.address,
         dob: req.userInfo.dob,
+        donation_point: req.userInfo.donation_point
     })
 })
 
@@ -165,16 +166,18 @@ router.put("/user/update", auth.userGuard,upload.single('picture'), (req, res) =
         user.updateOne({
             _id: id
         }, {
-            firstname: firstname,
-            lastname: lastname,
-            phone: phone,
-            username:username,
-            address:address,
-            phone: phone,
+            
             password:password,
             email:email,
-            dob:dob,
-
+            profile:{
+                firstname: firstname,
+                lastname: lastname,
+                phone: phone,
+                username:username,
+                address:address,
+                phone: phone,
+                dob:dob,
+            }
         })
         .then(() => {
             res.json({ message: "updated sucessfully" })
