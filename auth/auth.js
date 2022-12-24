@@ -40,13 +40,13 @@ module.exports.staff_guard = (req,res,next)=>{
             next();
         })
         .catch((e)=>{
-            res.json({msg: "Invalid Token"});
+            res.status(201).json({msg:"Invalid Token"})
         })
 
 
     }
     catch(e){
-        res.json({msg:"Invalid Token"})
+        res.status(201).json({msg:"Invalid Token"})
     }
 }
 

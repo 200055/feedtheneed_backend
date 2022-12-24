@@ -5,7 +5,77 @@ const user = require('../models/userModel');
 const jwt = require('jsonwebtoken');
 const auth = require('../auth/auth');
 const upload = require('../fileupload/fileupload');
+const nodemailer = require('nodemailer');
+const Otp = require('../models/otpModel');
 
+// mail send details
+var transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth:{
+        user:'emergencyiot@gmail.com',
+        pass:'emailSend@Bhos@di'
+    },
+    tls:{
+        rejectUnauthorized: false
+    }
+})
+
+//email send
+router.post("/user/email-send", async (req,res)=>{
+    let data = await user.findOne({email: req.body.email});
+    console.log(data)
+    const responseType = {};
+    if (data){
+        let otpcode = Math.floor((Math.random()*10000)+1);
+        let otpData = new Otp({
+            email: req.body.email,
+            code: otpcode,
+            expireIn: new Date().getTime()+300*1000
+        })
+        let otpResponse = await otpData.save();  
+        responseType.statusText = 'Success'
+        responseType.message = 'Please Check Your Email'; 
+    } else{
+        responseType.statusText = 'Failed'
+        responseType.message = 'Email doesnot exist'; 
+    }
+    res.status(200).json(responseType)
+})
+
+//change password
+router.post('/user/resetPassword', async (req,res)=>{
+    let data = await Otp.find({email:req.body.email,code:req.body.otpCode});
+    const currentPassword = req.body.currentPassword
+    const responseType = {}
+    if (data){
+        let currentTime = new Date().getTime();
+        let diff = data.expireIn - currentTime;
+        if (diff < 0){
+            responseType.statusText = 'Token Expired'
+            responseType.message = 'Error'; 
+        }else{
+            user.findOne({ email: req.body.email }).then(async (user) => {
+                //encrypt newly submitted password
+                // async-await syntax
+                  console.log(user.password);
+                  //Update password for user with new password
+                  bcryptjs.genSalt(10, (err, salt) =>
+                    bcryptjs.hash(currentPassword, salt, (err, hash) => {
+                      if (err) throw err;
+                      user.password = hash;
+                      user.save();
+                    })
+                  );
+                  res.send( {msg:"Password successfully updated!"});
+                  return;
+                
+            })
+        }
+    } else{
+        responseType.message = 'Invalid Otp'
+        responseType.statusText = 'Error';
+    }
+})
 
 // register
 router.post("/user/insert", (req,res)=>{
