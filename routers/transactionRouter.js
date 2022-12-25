@@ -15,14 +15,18 @@ router.post("/user/send_transaction",auth.userGuard, (req,res)=>{
     const donor_name = req.body.donor_name;
     const donor_note = req.body.donor_note;
     const donor_address = req.body.donor_address;
+    const idx = req.body.idx;
+    const token = req.body.token;
 
     const data = new transaction({
         user_id: user_id,
-        donation_amount: donation_amount,
+        donation_amount: donation_amount, 
         donation_category: donation_category,
         donor_name: donor_name,
         donor_address: donor_address,
         donor_note: donor_note,
+        idx: idx,
+        token: token,
     })
     data.save()
     .then(()=>{

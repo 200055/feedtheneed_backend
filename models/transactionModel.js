@@ -23,6 +23,12 @@ const Transaction = new mongoose.Schema({
     donor_address:{
         type: String
     },
+    idx:{
+        type: String
+    },
+    token:{
+        type: String
+    },
     created_at: { 
         type: Date, 
         required: true, 
