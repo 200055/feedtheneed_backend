@@ -1,11 +1,9 @@
 const express = require('express');
-const bcryptjs = require('bcryptjs');
 const router = new express.Router();
 const user = require('../models/userModel');
 const transaction = require('../models/transactionModel');
-const jwt = require('jsonwebtoken');
 const auth = require('../auth/auth');
-const upload = require('../fileupload/fileupload');
+const refund = require('../models/refundDonationModel');
 
 //transaction send
 router.post("/user/send_transaction",auth.userGuard, (req,res)=>{
@@ -56,6 +54,7 @@ router.put("/user/donation_point",auth.userGuard,(req,res)=>{
     })
 })
 
+//view leadearboard
 router.get("/leaderboard",async(req,res)=>{
     await user.find({})
     .then((user) => {
@@ -71,6 +70,7 @@ router.get("/leaderboard",async(req,res)=>{
       });
 })
 
+//view all transaction on the system
 router.get("/all_transaction",async(req,res)=>{ 
     await transaction.find({})
     .populate({
@@ -88,6 +88,8 @@ router.get("/all_transaction",async(req,res)=>{
         });
       });
 })
+
+// see user transaction by the user
 router.get("/user_transaction",auth.userGuard,async(req,res)=>{
     await transaction.find({
         user_id: req.userInfo._id
@@ -105,6 +107,7 @@ router.get("/user_transaction",auth.userGuard,async(req,res)=>{
       });
 })
 
+// admin can change donation status
 router.put("/change_donation_status/:id",auth.admin_guard,(req,res)=>{
   const transaction_id = req.params.id;
   const donation_status = req.body.donation_status
@@ -142,7 +145,27 @@ router.get("/admin/user_transaction/:user_id",auth.admin_guard,async(req,res)=>{
     });
 })
 
-// router.post("/cancel_donation_request")
+//refund request by user
+router.post("/cancel_donation_request/:transaction_id",auth.userGuard, async (req,res)=>{
+  const transacion_id = req.params.transacion_id;
+  const user_id = req.userInfo._id;
+  const feedback = req.body.feedback;
+  const cancel_reason = req.body.cancel_reason;
+
+  const data = new refund({
+    user_id: user_id,
+    transacion_id: transacion_id,
+    feedback: feedback,
+    cancel_reason: cancel_reason
+  })
+  data.save()
+  .then(()=>{
+      res.json({success:true, msg:"Refund Request Sent"})}  
+  )
+  .catch((e)=>{
+      res.json({msg:"Failed to send Refund Request"})
+  })
+})
 
 
 
