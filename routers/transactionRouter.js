@@ -150,13 +150,13 @@ router.post("/refund_donation_request/:transaction_id",auth.userGuard, async (re
   const transacion_id = req.params.transacion_id;
   const user_id = req.userInfo._id;
   const feedback = req.body.feedback;
-  const cancel_reason = req.body.cancel_reason;
+  const refund_reason = req.body.refund_reason;
 
   const data = new refund({
     user_id: user_id,
     transacion_id: transacion_id,
     feedback: feedback,
-    cancel_reason: cancel_reason
+    refund_reason: refund_reason
   })
   data.save()
   .then(()=>{
