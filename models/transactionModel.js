@@ -29,6 +29,10 @@ const Transaction = new mongoose.Schema({
     token:{
         type: String
     },
+    donation_status:{
+        type: String,
+        default: "Pending"
+    },
     created_at: { 
         type: Date, 
         required: true, 

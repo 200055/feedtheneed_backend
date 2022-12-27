@@ -2,6 +2,7 @@ const express = require('express');
 const bcryptjs = require('bcryptjs');
 const router = new express.Router();
 const admin = require('../models/adminModel');
+const user = require('../models/userModel');
 const jwt = require('jsonwebtoken');
 const auth = require('../auth/auth');
 const contact = require('../models/contactUsModel');
@@ -147,6 +148,16 @@ router.get('/admin/dashboard',auth.admin_guard,(req,res)=>{
         username : req.adminInfo.username,
         email : req.adminInfo.email
     })
+})
+
+//view all users
+router.get('/users', async (req,res)=>{
+  const user_details = await user.find({})
+  if (!user_details) {
+      res.status(500).json({success: false});
+    } else {
+      res.status(201).json(user_details ); 
+    }
 })
 
 
