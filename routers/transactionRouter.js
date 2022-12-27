@@ -146,7 +146,7 @@ router.get("/admin/user_transaction/:user_id",auth.admin_guard,async(req,res)=>{
 })
 
 //refund request by user
-router.post("/cancel_donation_request/:transaction_id",auth.userGuard, async (req,res)=>{
+router.post("/refund_donation_request/:transaction_id",auth.userGuard, async (req,res)=>{
   const transacion_id = req.params.transacion_id;
   const user_id = req.userInfo._id;
   const feedback = req.body.feedback;
