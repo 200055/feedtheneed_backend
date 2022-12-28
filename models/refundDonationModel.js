@@ -12,7 +12,7 @@ const RefundDonation = new mongoose.Schema({
     feedback:{
         type: String
     },
-    cancel_reason:{
+    refund_reason:{
         type: String
     },
     created_at: { 
