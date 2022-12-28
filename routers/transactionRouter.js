@@ -55,20 +55,20 @@ router.put("/user/donation_point",auth.userGuard,(req,res)=>{
 })
 
 //view leadearboard
-router.get("/leaderboard",async(req,res)=>{
-    await user.find().sort({donation_point:1})
-    .then((user) => {
-        res.status(201).json({
-          success: true,
-          data: user,
-        });
-      })
-      .catch((e) => {
-        res.json({
-          msg: e,
-        });
+router.get("/leaderboard", async (req, res) => {
+  await user.find().sort({donation_point: -1})
+    .then((users) => {
+      res.status(201).json({
+        success: true,
+        data: users,
       });
-})
+    })
+    .catch((e) => {
+      res.json({
+        msg: e,
+      });
+    });
+});
 
 //view all transaction on the system
 router.get("/all_transaction",async(req,res)=>{ 

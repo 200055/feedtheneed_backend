@@ -15,8 +15,7 @@ const User = new mongoose.Schema({
         required : true,
     },
     donation_point:{
-        
-        type:String,
+        type:Number,
         "default": 0.0  ,
     },
     age:{
