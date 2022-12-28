@@ -35,7 +35,6 @@ router.post("/user/send_transaction",auth.userGuard, (req,res)=>{
     .catch((e)=>{
         res.json({msg:"Transaction Failed"})
     })
-    const sort = { donation_amount: 1 };
 })
 
 router.put("/user/donation_point",auth.userGuard,(req,res)=>{
@@ -69,7 +68,6 @@ router.get("/leaderboard",async(req,res)=>{
           msg: e,
         });
       });
-      const sort = { length: 1 };
 })
 
 //view all transaction on the system
@@ -148,27 +146,60 @@ router.get("/admin/user_transaction/:user_id",auth.admin_guard,async(req,res)=>{
 })
 
 //refund request by user
-router.post("/refund_donation_request/:transaction_id",auth.userGuard, async (req,res)=>{
-  const transacion_id = req.params.transacion_id;
+router.post("/refund_donation_request/:transaction_id",auth.userGuard, async(req,res)=>{
+  const transaction_id = req.params.transaction_id;
   const user_id = req.userInfo._id;
   const feedback = req.body.feedback;
   const refund_reason = req.body.refund_reason;
 
-  const data = new refund({
-    user_id: user_id,
-    transacion_id: transacion_id,
-    feedback: feedback,
-    refund_reason: refund_reason
-  })
-  data.save()
-  .then(()=>{
-      res.json({success:true, msg:"Refund Request Sent"})}  
-  )
-  .catch((e)=>{
-      res.json({msg:"Failed to send Refund Request"})
-  })
+  
+  const isAvailable = await transaction.findById(transaction_id);
+  
+  if (isAvailable == null){
+    res.json({success:false, msg:"No transaction available"})
+  } else{
+    const data = new refund({
+      user_id: user_id,
+      transaction_id: transaction_id,
+      feedback: feedback,
+      refund_reason: refund_reason
+    })
+    data.save()
+    .then(()=>{
+        res.json({success:true, msg:"Refund Request Sent"})}  
+    )
+    .catch((e)=>{
+        res.json({msg:"Failed to send Refund Request"})
+    })
+  }
 })
 
+//view all refund requests by admin
+router.get("/all_refund_request",auth.admin_guard, async(req,res)=>{
+  const refund_requests = await refund.find({})
+    if (!refund_requests) {
+        res.status(500).json({success: false});
+      } else {
+        res.status(201).json(refund_requests ); 
+      }
+})
+
+//router to delete refund request
+router.delete('/refund_request/:refund_id',auth.admin_guard, async(req,res)=>{
+  const refund_id = req.params.refund_id;
+  console.log(refund_id);
+  const transaction_id = await refund.findOne({
+    _id: refund_id
+  })
+  (refund.deleteOne({_id: refund_id}) && transaction.deleteOne({_id: transaction_id.transaction_id}))
+  .then(()=>{
+      res.json({success:true, msg: "Refunded"})
+  })
+  .catch((e)=>{
+      res.json(e)
+  })
+
+})
 
 
 
