@@ -56,7 +56,7 @@ router.put("/user/donation_point",auth.userGuard,(req,res)=>{
 
 //view leadearboard
 router.get("/leaderboard",async(req,res)=>{
-    await user.find({})
+    await user.find().sort({donation_point:1})
     .then((user) => {
         res.status(201).json({
           success: true,
@@ -191,7 +191,7 @@ router.delete('/refund_request/:refund_id',auth.admin_guard, async(req,res)=>{
   const transaction_id = await refund.findOne({
     _id: refund_id
   })
-  (refund.deleteOne({_id: refund_id}) && transaction.deleteOne({_id: transaction_id.transaction_id}))
+  refund.deleteOne({_id: refund_id})
   .then(()=>{
       res.json({success:true, msg: "Refunded"})
   })

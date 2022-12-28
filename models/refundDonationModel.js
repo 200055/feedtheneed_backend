@@ -10,10 +10,17 @@ const RefundDonation = new mongoose.Schema({
         ref: "Transcation"
     },
     feedback:{
-        type: String
+        type: String,
+        required: true
     },
     refund_reason:{
-        type: String
+        type: String,
+        required: true
+    },
+    refund_status:{
+        type: String,
+        default:"Not Refunded",
+        required: true
     },
     created_at: { 
         type: Date, 
