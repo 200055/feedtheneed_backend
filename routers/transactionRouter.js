@@ -72,7 +72,7 @@ router.get("/leaderboard",async(req,res)=>{
 
 //view all transaction on the system
 router.get("/all_transaction",async(req,res)=>{ 
-    await transaction.find({})
+    await transaction.find().sort({created_at:-1})
     .populate({
         path: "user_id"
     })
@@ -145,6 +145,19 @@ router.get("/admin/user_transaction/:user_id",auth.admin_guard,async(req,res)=>{
     });
 })
 
+//admin can delete a transaction
+router.delete("/delete_transaction/:transaction_id", auth.admin_guard, async (req, res) => {
+  try {
+    const transaction_id = req.params.transaction_id;
+    await transaction.deleteOne({
+      _id: transaction_id,
+    });
+    res.json({ success: true, msg: "Transaction Deleted" });
+  } catch (e) {
+    res.json({ msg: "Failed to delete transaction" });
+  }
+});
+
 //refund request by user
 router.post("/refund_donation_request/:transaction_id",auth.userGuard, async(req,res)=>{
   const transaction_id = req.params.transaction_id;
@@ -187,20 +200,62 @@ router.get("/all_refund_request",auth.admin_guard, async(req,res)=>{
 //router to delete refund request
 router.delete('/refund_request/:refund_id',auth.admin_guard, async(req,res)=>{
   const refund_id = req.params.refund_id;
-  console.log(refund_id);
   const transaction_id = await refund.findOne({
     _id: refund_id
   })
-  refund.deleteOne({_id: refund_id})
-  .then(()=>{
-      res.json({success:true, msg: "Refunded"})
-  })
-  .catch((e)=>{
-      res.json(e)
-  })
+
+  refund.deleteOne({_id: refund_id}, (err) => {
+    if (err) {
+      // handle error
+      res.status(500).send({ error: 'An error occurred while deleting the documents' });
+    } else {
+      // documents deleted
+      transaction.deleteOne({_id: transaction_id.transaction_id}, (err) => {
+        if (err) {
+          // handle error
+          res.status(500).send({ error: 'An error occurred while deleting the documents' });
+        } else {
+          // documents deleted
+          res.send({ message: 'Refunded & Transaction deleted successfully' });
+        }
+      });
+    }
+  });
 
 })
 
+router.patch('/update_donation_point', async (req, res) => {
+  try {
+    // Get the sum of all donations for each user
+    const aggregateResult = await transaction.aggregate([
+      {
+        $group: {
+          _id: '$user_id',
+          totalDonationAmount: { $sum: '$donation_amount' }
+        }
+      }
+    ]);
+
+    // Convert the total donation amounts to donation points
+    const donationPointUpdates = aggregateResult.map(item => ({
+      updateOne: {
+        filter: { _id: item._id },
+        update: {
+          $set: {
+            donation_point: item.totalDonationAmount / 1000
+          }
+        }
+      }
+    }));
+
+    // Use the bulkWrite function to update all users in a single operation
+    await user.bulkWrite(donationPointUpdates);
+
+    res.send({ message: 'Donation points updated successfully' });
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
 
 
 module.exports = router;
