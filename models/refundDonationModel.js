@@ -7,7 +7,7 @@ const RefundDonation = new mongoose.Schema({
     },
     transaction_id:{
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Transcation"
+        ref: "Transaction"
     },
     feedback:{
         type: String,

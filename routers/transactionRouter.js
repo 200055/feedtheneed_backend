@@ -164,13 +164,19 @@ router.post("/refund_donation_request/:transaction_id",auth.userGuard, async(req
   const user_id = req.userInfo._id;
   const feedback = req.body.feedback;
   const refund_reason = req.body.refund_reason;
-
   
   const isAvailable = await transaction.findById(transaction_id);
-  
+  const alreadyRefundRequestSent = await refund.findOne({
+    transaction_id:transaction_id 
+  })
+
   if (isAvailable == null){
     res.json({success:false, msg:"No transaction available"})
-  } else{
+  } 
+  else if(alreadyRefundRequestSent !=null){
+    res.json({success:false, msg:"Refund Request Already Sent"})
+  }
+  else{
     const data = new refund({
       user_id: user_id,
       transaction_id: transaction_id,
@@ -189,7 +195,10 @@ router.post("/refund_donation_request/:transaction_id",auth.userGuard, async(req
 
 //view all refund requests by admin
 router.get("/all_refund_request",auth.admin_guard, async(req,res)=>{
-  const refund_requests = await refund.find({})
+  const refund_requests = 
+  await refund.find()
+  .populate("user_id")
+  .populate("transaction_id")
     if (!refund_requests) {
         res.status(500).json({success: false});
       } else {
@@ -197,7 +206,22 @@ router.get("/all_refund_request",auth.admin_guard, async(req,res)=>{
       }
 })
 
-//router to delete refund request
+//router only refund request
+router.delete('/delete_only_refund_request/:refund_id',auth.admin_guard, async(req,res)=>{
+  const refund_id = req.params.refund_id;
+
+refund.deleteOne({_id: refund_id}, (err) => {
+  if (err) {
+    // handle error
+    res.status(500).send({ error: 'An error occurred while deleting the documents' });
+  } else {
+    res.send({ message: 'Refunded Request Deleted successfully' });
+    }
+  });
+})
+
+
+//router to delete refund request and transaction
 router.delete('/refund_request/:refund_id',auth.admin_guard, async(req,res)=>{
   const refund_id = req.params.refund_id;
   const transaction_id = await refund.findOne({
