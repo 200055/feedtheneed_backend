@@ -43,6 +43,12 @@ const User = new mongoose.Schema({
     },
     username:{
         type : String,
+    },
+    otp: {
+        type: String,
+    },
+    expiresAt: {
+        type: Date
     }
 })
 

@@ -6,76 +6,142 @@ const jwt = require('jsonwebtoken');
 const auth = require('../auth/auth');
 const upload = require('../fileupload/fileupload');
 const nodemailer = require('nodemailer');
-const Otp = require('../models/otpModel');
 
-// mail send details
-var transporter = nodemailer.createTransport({
-    service: 'gmail',
+// Set up the Nodemailer transport
+const transporter = nodemailer.createTransport({
+    host: 'smtp.ethereal.email',
+    port: 587,
+    secure: false, // use TLS
     auth: {
-        user: 'emergencyiot@gmail.com',
-        pass: 'emailSend@Bhos@di'
-    },
-    tls: {
-        rejectUnauthorized: false
+        user: 'chet87@ethereal.email',
+        pass: 'N64kAdgxhNEj2VGAA1'
     }
-})
+  });
+  
+  // Generate a random OTP
+  const randomNumber = require('random-number-csprng');
+  
+  async function generateOTP() {
+    const otp = await randomNumber(10000, 99999);
+    return otp;
+  }
 
-//email send
-router.post("/user/email-send", async (req, res) => {
-    let data = await user.findOne({ email: req.body.email });
-    console.log(data)
-    const responseType = {};
-    if (data) {
-        let otpcode = Math.floor((Math.random() * 10000) + 1);
-        let otpData = new Otp({
-            email: req.body.email,
-            code: otpcode,
-            expireIn: new Date().getTime() + 300 * 1000
-        })
-        let otpResponse = await otpData.save();
-        responseType.statusText = 'Success'
-        responseType.message = 'Please Check Your Email';
+// Send OTP email route
+router.post('/user/send-otp', async (req, res) => {
+  const email = req.body.email;
+
+  // Check if the email is in the database
+  const User = await user.findOne({ email: email });
+  if (!User) {
+    return res.status(404).send({ message: 'User not found' });
+  }
+
+  // Generate and save the OTP
+  const otp = await generateOTP();
+
+  // Encrypt the OTP using bcrypt
+  const salt = await bcryptjs.genSalt(10);
+  const encryptedOTP = await bcryptjs.hash(otp.toString(), salt);
+  User.otp = encryptedOTP;
+
+  // Set the expiration time for the OTP
+  const expiresInMinutes = 15;
+  User.expiresAt = Date.now() + expiresInMinutes * 60 * 1000;
+  await User.save();
+
+  // Send the OTP in an email
+  const mailOptions = {
+    from: 'sender@example.com',
+    to: email,
+    subject: 'Feed The Need Reset Password',
+    text: `Your OTP to reset Feed The Need Password is: ${otp}`
+  };
+
+  transporter.sendMail(mailOptions, function(error, info){
+    if (error) {
+      console.log(error);
+      res.status(500).send({ message: 'Error sending email' });
     } else {
-        responseType.statusText = 'Failed'
-        responseType.message = 'Email doesnot exist';
+      console.log('Email sent: ' + info.response);
+      res.send({ message: 'OTP sent successfully' });
     }
-    res.status(200).json(responseType)
-})
+  });
+});
 
-//change password
-router.post('/user/resetPassword', async (req, res) => {
-    let data = await Otp.find({ email: req.body.email, code: req.body.otpCode });
-    const currentPassword = req.body.currentPassword
-    const responseType = {}
-    if (data) {
-        let currentTime = new Date().getTime();
-        let diff = data.expireIn - currentTime;
-        if (diff < 0) {
-            responseType.statusText = 'Token Expired'
-            responseType.message = 'Error';
-        } else {
-            user.findOne({ email: req.body.email }).then(async (user) => {
-                //encrypt newly submitted password
-                // async-await syntax
-                console.log(user.password);
-                //Update password for user with new password
-                bcryptjs.genSalt(10, (err, salt) =>
-                    bcryptjs.hash(currentPassword, salt, (err, hash) => {
-                        if (err) throw err;
-                        user.password = hash;
-                        user.save();
-                    })
-                );
-                res.send({ msg: "Password successfully updated!" });
-                return;
-
-            })
-        }
-    } else {
-        responseType.message = 'Invalid Otp'
-        responseType.statusText = 'Error';
+// Verify OTP route
+router.post('/user/verify-otp', async (req, res) => {
+    const email = req.body.email;
+    const otp = req.body.otp;
+  
+    // Check if the email is in the database
+    const User = await user.findOne({ email: email });
+    if (!User) {
+        return res.status(404).send({ message: 'User not found' });
     }
-})
+
+    // Check if the OTP is expired
+    if (User.expiresAt < Date.now()) {
+        return res.status(400).send({ message: 'OTP expired' });
+    }
+
+    console.log(User.otp);
+    // Check if the OTP is correct
+    if (!User.otp) {
+        return res.status(400).send({ message: 'Invalid OTP' });
+    }
+    const isMatch = await bcryptjs.compare(otp, User.otp);
+    
+    if (!isMatch) {
+        return res.status(400).send({ message: 'Invalid OTP' });
+    }
+
+    // If the OTP is correct, remove it from the user's record
+    User.otp = undefined;
+    User.expiresAt = undefined;
+    await User.save();
+
+    // Set a flag in the session to indicate that the OTP has been verified
+    req.session.otpVerified = true;
+    console.log(req.session.otpVerified);
+
+    res.send({ message: 'OTP verified successfully' });
+});
+
+// Reset password route
+router.post('/user/reset-password', async (req, res) => {
+    console.log(req.session.otpVerified);
+    // Check if the OTP has been verified
+    if (!req.session.otpVerified) {
+        return res.status(400).send({ message: 'OTP not verified' });
+    }
+
+    // Reset the OTP verification flag
+    req.session.otpVerified = false;
+
+    // Get the new password from the request body
+    const newPassword = req.body.newPassword;
+    if (!newPassword) {
+        return res.status(400).send({ message: 'New password required' });
+    }
+
+    // Find the user in the database
+    const email = req.body.email;
+    const User = await user.findOne({ email: email });
+    if (!User) {
+        return res.status(404).send({ message: 'User not found' });
+    }
+
+    // Hash the new password using bcrypt
+    const salt = await bcryptjs.genSalt(10);
+    const hashedPassword = await bcryptjs.hash(newPassword, salt);
+
+    // Update the user's password in the database
+    User.password = hashedPassword;
+    await User.save();
+
+    res.send({ message: 'Password reset successfully' });
+  
+});    
 
 // register
 router.post("/user/insert", (req, res) => {

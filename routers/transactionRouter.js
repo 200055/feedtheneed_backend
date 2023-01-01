@@ -111,7 +111,25 @@ router.get("/user_transaction",auth.userGuard,async(req,res)=>{
 router.put("/change_donation_status/:id",auth.admin_guard,(req,res)=>{
   const transaction_id = req.params.id;
   const donation_status = req.body.donation_status
-  console.log(donation_status);
+
+  transaction.updateOne({
+    _id:transaction_id
+  },{
+    donation_status: donation_status
+  })
+  .then(()=>{
+    
+    res.json({success:true, msg:"Updated"})}  
+  )
+  .catch((e)=>{
+      res.json({msg:"Failed to change donation status"})
+  })
+})
+
+// staff can change donation status
+router.put("/staff/change_donation_status/:id",auth.staff_guard,(req,res)=>{
+  const transaction_id = req.params.id;
+  const donation_status = req.body.donation_status
 
   transaction.updateOne({
     _id:transaction_id
@@ -129,6 +147,24 @@ router.put("/change_donation_status/:id",auth.admin_guard,(req,res)=>{
 
 //view user transaction by admin
 router.get("/admin/user_transaction/:user_id",auth.admin_guard,async(req,res)=>{
+  await transaction.find({
+      user_id: req.params.user_id
+  })
+  .then((transaction) => {
+      res.status(201).json({
+        success: true,
+        data: transaction,
+      });
+    })
+    .catch((e) => {
+      res.json({
+        msg: e,
+      });
+    });
+})
+
+//view user transaction by staff
+router.get("/staff/user_transaction/:user_id",auth.staff_guard,async(req,res)=>{
   await transaction.find({
       user_id: req.params.user_id
   })

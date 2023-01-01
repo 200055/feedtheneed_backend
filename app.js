@@ -2,13 +2,20 @@ const mongoose = require("mongoose");
 const express = require("express");
 const app = express();
 var cors = require('cors');
-
+const session = require('express-session');
 app.use(express.json());
 app.use(express.static(__dirname + '/photos'));
 
 app.use(cors())
 
 require('./db/database'); //connection
+
+app.use(session({
+    secret: 'feedthe@!@!#!1121Need@@!@!##!#',
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: true }
+}));
 
 const userRoute = require('./routers/userRoute');
 const adminRoute = require('./routers/adminRouter');
