@@ -120,7 +120,7 @@ router.get("/all_transaction_pagination", async (req, res) => {
 router.get("/user_transaction",auth.userGuard,async(req,res)=>{
     await transaction.find({
         user_id: req.userInfo._id
-    })
+    }).sort({created_at:-1})
     .then((transaction) => {
         res.status(201).json({
           success: true,
