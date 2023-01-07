@@ -88,6 +88,33 @@ router.get("/all_transaction",async(req,res)=>{
         });
       });
 })
+//pagination transaction
+router.get("/all_transaction_pagination", async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const perPage = parseInt(req.query.perPage);
+  const totalCount = await transaction.countDocuments();
+  const totalPages = Math.ceil(totalCount / perPage);  // Calculate the total number of pages
+  await transaction
+    .find()
+    .skip(perPage * (page - 1))
+    .limit(perPage)
+    .sort({ created_at: -1 })
+    .populate({
+      path: "user_id",
+    })
+    .then((transactions) => {
+      res.status(201).json({
+        success: true,
+        data: transactions,
+        totalPages: totalPages,  // Return the total number of pages
+      });
+    })
+    .catch((e) => { 
+      res.json({
+        msg: e,
+      });
+    });
+});
 
 // see user transaction by the user
 router.get("/user_transaction",auth.userGuard,async(req,res)=>{
