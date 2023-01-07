@@ -43,7 +43,7 @@ router.get('/contact', async (req,res)=>{
 
 })
 // view one contact us 
-router.put('/contact/:id', auth.staff_guard, (req,res)=>{
+router.put('/contact/:id', auth.admin_guard, (req,res)=>{
     const  _id = req.params.id;
     const company_name = req.body.company_name;
     const company_address = req.body.company_address;
@@ -70,7 +70,7 @@ router.put('/contact/:id', auth.staff_guard, (req,res)=>{
 
 // *******visit us on maps*********
 // map us post
-router.post('/map',auth.staff_guard, (req,res)=>{
+router.post('/map',auth.admin_guard, (req,res)=>{
     const lat = req.body.lat;
     const long = req.body.long;
 
@@ -99,7 +99,7 @@ router.get('/map', async (req,res)=>{
 
 })
 // view one map us 
-router.put('/map/:id', auth.staff_guard, (req,res)=>{
+router.put('/map/:id', auth.admin_guard, (req,res)=>{
     const  _id = req.params.id;
     const lat = req.body.lat;
     const long = req.body.long;

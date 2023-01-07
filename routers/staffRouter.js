@@ -7,6 +7,9 @@ const auth = require('../auth/auth');
 const upload = require('../fileUpload/fileUpload');
 const partner = require('../models/partnerModel');
 const blog = require('../models/blogModel');
+const map = require('../models/mapsModel');
+const contact = require('../models/contactUsModel');
+
 
 // Staff register
 router.post('/staff/register',auth.admin_guard,(req,res)=>{
@@ -218,7 +221,7 @@ router.post('/blog/insert/staff/',auth.staff_guard,upload.fields([{name:'blog_im
 })
 
 // router for updating blog
-router.put('/blog/staff/update/:id', auth.staff_guard,upload.fields([{name:'blog_image',maxCount: 1},{name:'donor_image',maxCount: 1}]) , (req,res)=>{
+router.put('/staff/blog/update/:id', auth.staff_guard,upload.fields([{name:'blog_image',maxCount: 1},{name:'donor_image',maxCount: 1}]) , (req,res)=>{
   const  _id = req.params.id;
   const blog_name = req.body.blog_name;
   const short_desc = req.body.short_desc;
@@ -429,6 +432,50 @@ router.delete('/partner/staff/:id',auth.staff_guard, (req,res)=>{
       res.json(e)
   })
 
+})
+
+// view one contact us 
+router.put('/staff/contact/:id', auth.staff_guard, (req,res)=>{
+    const  _id = req.params.id;
+    const company_name = req.body.company_name;
+    const company_address = req.body.company_address;
+    const company_phone = req.body.company_phone;
+    const company_founded = req.body.company_founded;
+
+        contact.updateOne({
+            _id: _id
+        },{
+            company_name :  company_name,
+            company_address : company_address,
+            company_phone : company_phone,
+            company_founded : company_founded,
+        })
+        .then(()=>{
+            res.json({success:true, msg:"Updated"})}  
+        )
+        .catch((e)=>{
+            res.json({msg:"Failed to update contact us"})
+        })
+})
+
+// view one map us 
+router.put('/staff/map/:id', auth.staff_guard, (req,res)=>{
+    const  _id = req.params.id;
+    const lat = req.body.lat;
+    const long = req.body.long;
+
+        map.updateOne({
+            _id: _id
+        },{
+            lat :  lat,
+            long : long,
+        })
+        .then(()=>{
+            res.json({success:true, msg:"Updated"})}  
+        )
+        .catch((e)=>{
+            res.json({msg:"Failed to update map"})
+        })
 })
 
 
