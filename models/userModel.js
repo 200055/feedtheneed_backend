@@ -49,6 +49,10 @@ const User = new mongoose.Schema({
     },
     expiresAt: {
         type: Date
+    },
+    otpVerified: {
+        type: Boolean,
+        default: false
     }
 })
 
